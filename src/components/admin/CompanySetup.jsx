@@ -16,6 +16,7 @@ const CompanySetup = () => {
     const params = useParams()
 
     useGetCompanyById(params.id)
+
     const [input, setInput] = useState({
         name: "",
         description: "",
@@ -41,41 +42,49 @@ const CompanySetup = () => {
 
     const submitHandler = async (e) => {
         e.preventDefault()
-        const formData = new FormData();
 
-        console.log(input);
+        const formData = new FormData()
+
+        console.log(input)
 
         formData.append("name", input.name)
         formData.append("description", input.description)
         formData.append("website", input.website)
         formData.append("location", input.location)
+
         if (input.file) {
             formData.append("file", input.file)
         }
+
         try {
             setLoading(true)
-            const res = await axios.put(`${COMPANY_API_END_POINT}/update/${params.id}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
-                withCredentials: true
-            })
+
+            const res = await axios.put(
+                `${COMPANY_API_END_POINT}/update/${params.id}`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    withCredentials: true
+                }
+            )
+
             if (res.data.success) {
                 toast.success(res.data.message)
                 navigate("/admin/companies")
             }
+
         } catch (err) {
-            console.log(err);
-            toast.error(err.response.data.message)
-        }
-        finally {
+            console.log(err)
+            toast.error(err.response?.data?.message || "Something went wrong")
+        } finally {
             setLoading(false)
         }
-
     }
 
     useEffect(() => {
-        if (!singleCompany) return; // ✅ stop if null
+        if (!singleCompany) return
 
         setInput({
             name: singleCompany?.name || "",
@@ -83,22 +92,37 @@ const CompanySetup = () => {
             website: singleCompany?.website || "",
             location: singleCompany?.location || "",
             file: null
-        });
-    }, [singleCompany]);
+        })
+    }, [singleCompany])
 
     return (
         <div>
             <Navbar />
+
             <div className='max-w-xl mx-auto my-10'>
                 <form onSubmit={submitHandler}>
+
                     <div className='flex items-center gap-5 p-8'>
-                        <Button onClick={() => navigate("/admin/companies")} variant="outline" className='flex items-center gap-2 text-gray-500 font-semibold'>
+
+                        {/* Back Button */}
+                        <Button
+                            type="button"
+                            onClick={() => navigate("/admin/companies")}
+                            variant="outline"
+                            className='flex items-center gap-2 text-gray-500 font-semibold'
+                        >
                             <ArrowLeft />
                             <span>Back</span>
                         </Button>
-                        <h1 className='font-bold text-xl'>Company Setup</h1>
+
+                        <h1 className='font-bold text-xl'>
+                            Company Setup
+                        </h1>
+
                     </div>
+
                     <div className='grid grid-cols-2 gap-4'>
+
                         <div>
                             <Label>Company Name</Label>
                             <Input
@@ -108,6 +132,7 @@ const CompanySetup = () => {
                                 onChange={changeEventHandler}
                             />
                         </div>
+
                         <div>
                             <Label>Description</Label>
                             <Input
@@ -117,6 +142,7 @@ const CompanySetup = () => {
                                 onChange={changeEventHandler}
                             />
                         </div>
+
                         <div>
                             <Label>Website</Label>
                             <Input
@@ -126,6 +152,7 @@ const CompanySetup = () => {
                                 onChange={changeEventHandler}
                             />
                         </div>
+
                         <div>
                             <Label>Location</Label>
                             <Input
@@ -135,6 +162,7 @@ const CompanySetup = () => {
                                 onChange={changeEventHandler}
                             />
                         </div>
+
                         <div>
                             <Label>Logo</Label>
                             <Input
@@ -143,10 +171,29 @@ const CompanySetup = () => {
                                 onChange={changeFileHandler}
                             />
                         </div>
+
                     </div>
+
                     {
-                        loading ? <Button className="w-full my-4"><Loader2 className='mr-2 h-4 w-4 animate-spin' /> Please Wait </Button> : <Button type="submit" className="w-full my-4 bg-blue-600 text-white px-4 py-2 rounded">Update</Button>
+                        loading ? (
+                            <Button
+                                type="button"
+                                disabled
+                                className="w-full my-4"
+                            >
+                                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                                Please Wait
+                            </Button>
+                        ) : (
+                            <Button
+                                type="submit"
+                                className="w-full my-4 bg-blue-600 text-white px-4 py-2 rounded"
+                            >
+                                Update
+                            </Button>
+                        )
                     }
+
                 </form>
             </div>
         </div>
